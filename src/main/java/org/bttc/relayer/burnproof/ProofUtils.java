@@ -208,7 +208,6 @@ public class ProofUtils {
     Proof<Bytes> proof = trie.getValueWithProof(path);
 
     JSONArray rlpProofNodes = new JSONArray();
-    //返回的为节点的RLP编码
     List<Bytes> proofRelatedNodes = proof.getProofRelatedNodes();
     if (CollectionUtils.isEmpty(proofRelatedNodes)) {
       log.error("getReceiptProof fail, proof is null, tx is {}", txReceipt.getString(CommonConstant.TRANSACTION_HASH));
