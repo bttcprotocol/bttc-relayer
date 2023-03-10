@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.bttc.relayer.mapper.TransactionsMapper">
+
+  <resultMap id="BaseResultMap" type="org.bttc.relayer.bean.dao.Transactions">
+    <id column="id" property="id"/>
+    <result column="src_txid" property="srcTxid"/>
+    <result column="dest_txid" property="destTxid"/>
+    <result column="from_address" property="fromAddress"/>
+    <result column="to_address" property="toAddress"/>
+    <result column="dest_tx_owner" property="destTxOwner"/>
+    <result column="src_chain_id" property="srcChainId"/>
+    <result column="dest_chain_id" property="destChainId"/>
+    <result column="src_token_id" property="srcTokenId"/>
+    <result column="dest_token_id" property="destTokenId"/>
+    <result column="from_amount" property="fromAmount"/>
+    <result column="to_amount" property="toAmount"/>
+    <result column="nonce" property="nonce"/>
+    <result column="fee" property="fee"/>
+    <result column="from_block" property="fromBlock"/>
+    <result column="to_block" property="toBlock"/>
+    <result column="t_status" property="tStatus"/>
+    <result column="src_contract_ret" property="srcContractRet"/>
+    <result column="dest_contract_ret" property="destContractRet"/>
+    <result column="src_timestamp" property="srcTimestamp"/>
+    <result column="dest_timestamp" property="destTimestamp"/>
+    <result column="update_time" property="updateTime"/>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, src_txid, dest_txid, tsf_txid, from_address, to_address, dest_tx_owner, src_chain_id, dest_chain_id, src_token_id,
+    dest_token_id, from_amount, to_amount, nonce, fee, from_block, to_block,
+    t_status, src_contract_ret, dest_contract_ret, src_timestamp, dest_timestamp, update_time
+  </sql>
+
+  <insert id="insertSrcTxInfo">
+    INSERT INTO transactions (src_txid, from_address, to_address, dest_tx_owner, src_chain_id, dest_chain_id,
+    src_token_id, dest_token_id, from_amount, to_amount, nonce, fee, from_block,
+    t_status, src_contract_ret, src_timestamp)
+    VALUES
+    (#{item.srcTxid}, #{item.fromAddress}, #{item.toAddress}, #{item.destTxOwner}, #{item.srcChainId},
+    #{item.destChainId}, #{item.srcTokenId}, #{item.destTokenId},
+    #{item.fromAmount}, #{item.toAmount}, #{item.nonce}, #{item.fee}, #{item.fromBlock},
+    #{item.tStatus}, #{item.srcContractRet}, #{item.srcTimestamp})
+    ON DUPLICATE KEY UPDATE
+    src_txid = VALUES(src_txid),
+    from_address = VALUES(from_address),
+    to_address = VALUES(to_address),
+    dest_tx_owner = VALUES(dest_tx_owner),
+    src_chain_id = VALUES(src_chain_id),
+    dest_chain_id = VALUES(dest_chain_id),
+    src_token_id = VALUES(src_token_id),
+    dest_token_id = VALUES(dest_token_id),
+    from_amount = VALUES(from_amount),
+    to_amount = VALUES(to_amount),
+    nonce = VALUES(nonce),
+    fee = VALUES(fee),
+    from_block = VALUES(from_block),
+    t_status = VALUES(t_status),
+    src_contract_ret = VALUES(src_contract_ret),
+    src_timestamp = VALUES(src_timestamp)
+  </insert>
+
+  <insert id="insertSrcTxInfoUnConfirm">
+    INSERT ignore INTO transactions (src_txid, from_address, to_address, dest_tx_owner, src_chain_id,
+    dest_chain_id, src_token_id, dest_token_id, from_amount, to_amount, nonce, fee,
+    from_block, t_status, src_contract_ret, src_timestamp)
+    VALUES
+    (#{item.srcTxid}, #{item.fromAddress}, #{item.toAddress}, #{item.destTxOwner}, #{item.srcChainId},
+    #{item.destChainId}, #{item.srcTokenId}, #{item.destTokenId},
+    #{item.fromAmount}, #{item.toAmount}, #{item.nonce}, #{item.fee},
+    #{item.fromBlock}, #{item.tStatus},
+    #{item.srcContractRet}, #{item.srcTimestamp})
+  </insert>
+
+  <select id="getUserWithdrawMessages" resultType= "org.bttc.relayer.bean.dao.Transactions">
+    select * from transactions where (from_address=#{user} or to_address=#{user}) and src_chain_id=4;
+  </select>
+
+  <select id="getUserTransactionRecord" resultType= "org.bttc.relayer.bean.dao.Transactions">
+    select * from transactions where (from_address=#{user} or to_address=#{user});
+  </select>
+
+  <select id="updateTransactionCheckPoint" resultType= "org.bttc.relayer.bean.dao.Transactions">
+    select * from transactions where from_block &lt;=#{maxCheckPointBlockNum} and
+    dest_chain_id=#{chainId} and t_status=1 ORDER BY from_block ASC LIMIT 100;
+  </select>
+
+</mapper>

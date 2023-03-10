@@ -1,0 +1,132 @@
+plugins {
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+    id "org.ajoberstar.grgit" version "1.7.2"
+}
+
+group 'org.bttc.relayer'
+version '1.0-SNAPSHOT'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+import java.text.SimpleDateFormat
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url "https://repo1.maven.org/maven2" }
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/releases/"
+    }
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots/"
+    }
+    maven { url 'https://jitpack.io' }
+}
+
+task versionTxt()  {
+    doLast {
+        new File(buildDir, "version.txt").text = """
+            Version: $version
+            Revision: ${grgit.head().abbreviatedId}
+            Commiter: ${grgit.head().getCommitter().getEmail()}
+            Message: ${grgit.head().getShortMessage()}
+            Time: ${grgit.head().getDate().toString()}
+            Buildtime: ${new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())}
+            Application-name: bttc-relayer
+        """
+    }
+}
+
+dependencies {
+    compile fileTree(dir:'lib',includes:['*jar'])
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'mysql:mysql-connector-java'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.4.3.4'
+    implementation 'com.baomidou:mybatis-plus-generator:3.5.0'
+    implementation 'com.alibaba:druid-spring-boot-starter:1.1.23'
+    implementation 'org.freemarker:freemarker'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.apache.commons:commons-collections4:4.0'
+    implementation 'org.projectlombok:lombok:1.18.18'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'com.alibaba:fastjson:1.2.83'
+    compile group: 'com.madgag.spongycastle', name: 'prov', version: '1.58.0.0'
+    implementation 'org.aspectj:aspectjrt:1.9.7'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+    implementation('com.github.tronprotocol.java-tron:actuator:GreatVoyage-v4.4.3') {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'com.github.tronprotocol', module: 'zksnark-java-sdk'
+    }
+
+    implementation 'org.web3j:core:5.0.0'
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.68'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+    implementation 'com.xuxueli:xxl-job-core:2.3.0'
+
+    implementation 'io.grpc:grpc-netty:1.42.1'
+    implementation 'io.grpc:grpc-protobuf:1.42.1'
+    implementation 'io.grpc:grpc-stub:1.42.1'
+    implementation 'net.devh:grpc-client-spring-boot-starter:2.13.0.RELEASE'
+    implementation 'org.projectlombok:lombok:1.18.22'
+    implementation 'com.google.protobuf:protobuf-java-util:4.0.0-rc-2'
+
+    compile group: 'io.perfmark', name: 'perfmark-api', version: '0.21.0'
+
+    implementation 'com.github.briandilley.jsonrpc4j:jsonrpc4j:1.6'
+
+    compile group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '5.2'
+
+}
+
+build.finalizedBy(versionTxt)
+
+task copyJar(type: Copy) {
+    delete "$buildDir\\libs\\lib"
+    from configurations.compileClasspath
+    into "$buildDir\\libs\\lib"
+}
+
+task copyConfigFile(type: Copy) {
+    delete "$buildDir\\libs\\config"
+    from('src/main/resources')
+    into 'build/libs/config'
+}
+
+bootJar {
+    excludes = ["*.jar"]
+    dependsOn copyJar
+    dependsOn copyConfigFile
+
+    manifest {
+        attributes "Manifest-Version": 1.0,
+                'Class-Path': configurations.compileClasspath.files.collect { "lib/$it.name" }.join(' ')
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

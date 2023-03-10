@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.bttc.relayer.mapper.CheckPointInfoMapper">
+
+  <resultMap id="BaseResultMap" type="org.bttc.relayer.bean.dao.CheckPointInfo">
+    <id column="id" property="id" />
+    <result column="check_point_num" property="checkPointNum" />
+    <result column="tx_id" property="txId" />
+    <result column="start_block" property="startBlock" />
+    <result column="end_block" property="endBlock" />
+    <result column="block_number" property="blockNumber" />
+    <result column="chain_id" property="chainId" />
+    <result column="result" property="result" />
+    <result column="confirm" property="confirm" />
+    <result column="time_stamp" property="timeStamp" />
+  </resultMap>
+
+  <insert id="insertConfirmMsg">
+    INSERT INTO check_point_info (check_point_num, tx_id, start_block, end_block,
+    block_number, chain_id, result, confirm, time_stamp)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator="," >
+      (#{item.checkPointNum}, #{item.txId}, #{item.startBlock},
+      #{item.endBlock}, #{item.blockNumber}, #{item.chainId},
+      #{item.result}, #{item.confirm}, #{item.timeStamp})
+    </foreach>
+    ON DUPLICATE KEY UPDATE
+    check_point_num = VALUES(check_point_num),
+    tx_id = VALUES(tx_id),
+    start_block = VALUES(start_block),
+    end_block = VALUES(end_block),
+    block_number = VALUES(block_number),
+    chain_id = VALUES(chain_id),
+    result = VALUES(result),
+    confirm = VALUES(confirm),
+    time_stamp = VALUES(time_stamp)
+  </insert>
+
+  <insert id="insertUnConfirmMsg">
+    INSERT ignore INTO check_point_info (check_point_num, tx_id, start_block, end_block,
+    block_number, chain_id, result, confirm, time_stamp)
+    VALUES
+    <foreach collection="list" item="item" index="index" separator="," >
+      (#{item.checkPointNum}, #{item.txId}, #{item.startBlock},
+      #{item.endBlock}, #{item.blockNumber}, #{item.chainId},
+      #{item.result}, #{item.confirm}, #{item.timeStamp})
+    </foreach>
+  </insert>
+</mapper>

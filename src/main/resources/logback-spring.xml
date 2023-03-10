@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_HOME" value="logs/"/>
+    <property name="LOG_LEVEL" value="info"/>
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS},%X{trace_id} %-5level [%thread] %c{1}:%L - %msg%n"/>
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+    </appender>
+
+    <appender name="D" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/debug.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/debug.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <maxHistory>7</maxHistory>>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="I" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/info.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/info.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <maxHistory>7</maxHistory>>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="W" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/warn.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/warn.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <maxHistory>7</maxHistory>>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="E" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/error.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <maxHistory>7</maxHistory>>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <appender name="remote_logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>127.0.0.1:9100</destination>
+        <includeCallerData>true</includeCallerData>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeCallerData>true</includeCallerData>
+            <customFields>{"AppName":"bttc-relayer","TaskName":"${TaskName:-test}","Env":"${Env:-localTest}"}</customFields>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="E"/>
+        <appender-ref ref="W"/>
+        <appender-ref ref="I"/>
+        <appender-ref ref="D"/>
+        <appender-ref ref="remote_logstash"/>
+    </root>
+
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="trace"/>
+
+</configuration>

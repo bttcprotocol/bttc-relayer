@@ -1,0 +1,129 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/bttc_relayer_1029?allowMultiQueries=true&zeroDateTimeBehavior=convertToNull&characterEncoding=utf8&useSSL=true
+    username: root
+    password: root
+    druid:
+      name: bttc-relayer
+      dbType: mysql
+      filters: stat,wall
+      maxActive: 50
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 50
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+server:
+  port: 8081
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+  mapper-locations: classpath*:mappers/**/*Mapper.xml
+
+client:
+  tron:
+    api:
+      name: relayertest
+      key: 5f06e664-45b3-48d4-b065-ef60659727b7
+    baseurl: https://nile.trongrid.io/wallet/
+    baseurl-solidity: https://nile.trongrid.io/walletsolidity/
+    url: https://nile.trongrid.io/wallet/triggersmartcontract
+    contract-url: https://nile.trongrid.io/wallet/triggerconstantcontract
+    addresseventurl: https://nile.trongrid.io/v1/contracts/
+    txeventurl: https://nile.trongrid.io/v1/transactions/#1/events
+    transaction-url: https://nile.trongrid.io/wallet/gettransactionbyid
+    transaction-solidity-url: https://nile.trongrid.io/walletsolidity/gettransactionbyid
+    transactioninfo-url: https://nile.trongrid.io/wallet/gettransactioninfobyid
+    transactioninfo-solidity-url: https://nile.trongrid.io/walletsolidity/gettransactioninfobyid
+  bttc:
+    url: https://pre-rpc.bittorrentchain.io
+    eventurl: https://pre-rpc.bittorrentchain.io
+    ChildERC20Exit: '0xa0627d657aeb4e733a38d57b62ef024bcc13d75a'
+  slack:
+    url: ""
+
+parseData:
+  tronRootChainManagerProxy: "TV714HHcDKhrCrvufcdBz68frRvtbLgXa5"
+  ethRootChainManagerProxy: "0x20e12886c737272700664c032707d4f3cb15284c"
+  bscRootChainManagerProxy: "0xb4bae202f91d1f3543be12d9641d42062f7cc511"
+  tronRootChainProxy: "TMZqpi58aSmgqaXHL28DPks8KnLgJgqkGz"
+  ethRootChainProxy: "0x42cdf3395bbd91ad1879b51f606c6ac51a34a9ce"
+  bscRootChainProxy: "0xe2319ebf0f7812dfc0d653b5225f21a93ba19197"
+  tronEtherPredicateProxy: "TS1HxBmCJyoQZHS98wEb9cGqXWRzPAejWa"
+  tronEtherPredicateProxyInEth: "0xafe6fa16c344d8393bb5ebb78f4c92cee4f0879b"
+  ethEtherPredicateProxy: "0xf87935ba160ba25f6e360f7fa5699ca262753a67"
+  bscEtherPredicateProxy: "0x6911f7555f89429ff85ff951aa686a03125bbd4e"
+  tronERC20PredicateProxy: "TPp2JR3pvvK4vTEQUbGTNwVqDhzKJFp4bt"
+  tronERC20PredicateProxyInEth: "0x97d515b421330c57c545d8dbe946ba7cad02dbb1"
+  ethERC20PredicateProxy: "0x7757e4cce658e851e9d5f65ea6d2d42eaec9dc7e"
+  bscERC20PredicateProxy: "0x3262384ff37a75661e97b9ba7ee404555627213e"
+  tronMintableERC20PredicateProxy: "TUFWVA7fDHhvURrdNm9PS9mCPqx6T7mEPm"
+  tronMintableERC20PredicateProxyInEth: "0xc88783c97908540d4f1e918c44e2192a10920fb6"
+  ethMintableERC20PredicateProxy: "0x5af2bca15245d534ede87a03c007852e055d4b87"
+  bscMintableERC20PredicateProxy: "0x5f32098ca8b566f86b09a33e3b13e0da4a58c6c8"
+  tronStakingInfo: "TGncz2EJ4KYF4Svs7Goh7CXz6WUhV84oKn"
+  EventsHubProxy: "TFuYeiX5M1yXhVDHfdsQewqwvwEQdmhkZA"
+  trxToken: "TZDXJyYhSjM8T4cUYqGj2yib718E7ZmGQc"
+  ethToken: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
+  bnbToken: "0xff00000000000000000000000000000000000002"
+  bttToken: "0x0000000000000000000000000000000000001010"
+  tronInitBlockNumber: 20007063
+  ethInitBlockNumber: 5600571
+  bscInitBlockNumber: 12808031
+  bttcInitBlockNumber: 1
+  parseTimeout: 8
+  confirmTimeout: 20
+
+xxl:
+  job:
+    admin:
+      addresses: "http://localhost:8080/xxl-job-admin"
+    accessToken:
+    executor:
+      appname: "bttc-relayer-1029"
+      address:
+      ip:
+      port: 9999
+      logpath: "./logs"
+      logretentiondays: 30
+
+rpc:
+  eth:
+    chainId: 5
+  bsc:
+    chainId: 97
+
+grpc:
+  client:
+    GLOBAL:
+      address: "grpc.nile.trongrid.io:50051"
+      enable-keep-alive: true
+      keep-alive-without-calls: true
+      negotiation-type: plaintext
+
+relayer:
+  address:
+    bttc: ""
+  defaultGasPrice:
+    eth: 75012778256
+    bsc: 21000000000
+  defaultGasPriceLimit:
+    eth: 300000000000
+    bsc: 30000000000
+  key: ""
+
+setting:
+  project: bttc-relayer
+  env: 1029
