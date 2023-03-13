@@ -50,7 +50,7 @@ client:
   bttc:
     url: https://pre-rpc.bittorrentchain.io
     eventurl: https://pre-rpc.bittorrentchain.io
-    ChildERC20Exit: '0xa0627d657aeb4e733a38d57b62ef024bcc13d75a'
+    ChildERC20Exit: '0xD939790f9E7B6223Be2e26c4D6a12E302F188D79'
   slack:
     url: ""
 

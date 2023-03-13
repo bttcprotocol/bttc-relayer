@@ -50,7 +50,7 @@ client:
   bttc:
     url: https://bttc.trongrid.io
     eventurl: https://bttc.trongrid.io
-    ChildERC20Exit: '0x083318c0596604035c18c36033c7dbc9f1311495'
+    ChildERC20Exit: '0x2C166B83394838D650E4985cE93dE26CFA68A25D'
   slack:
     url: ""
 

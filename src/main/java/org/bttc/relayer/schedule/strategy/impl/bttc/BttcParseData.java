@@ -110,7 +110,7 @@ public class BttcParseData implements BttcParseDataStrategy {
         childERC20Exit,
         withdrawTopicsList);
     if (MapUtils.isEmpty(result)) {
-      // didn't get the lgo, return and retry later
+      // didn't get the log, return and retry later
       return 0L;
     }
 
