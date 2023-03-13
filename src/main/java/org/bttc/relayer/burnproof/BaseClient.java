@@ -50,28 +50,23 @@ public class BaseClient {
   public JSONObject buildPayloadForExit(String hash, int chainId) throws InterruptedException {
     JSONObject result = new JSONObject();
     long blockNumber = -1;
-    long t1 = System.currentTimeMillis();
     JSONObject txReceipt = bttcParseData.getTransactionReceipt(hash);
-    long t2 = System.currentTimeMillis();
     if (MapUtils.isEmpty(txReceipt)) {
       log.error("buildPayloadForExit fail, txReceipt is null, chainId is {}, tx is {}", chainId, hash);
       return new JSONObject();
     }
     int eventIndex = findWithdrawLogIndex(txReceipt);
-    long t3 = System.currentTimeMillis();
     if(eventIndex < 0) {
       log.error("buildPayloadForExit fail, there is no withdrawTo event. chainId is {}, tx is {}", chainId, hash);
       return new JSONObject();
     }
 
     JSONObject txObj = bttcParseData.getTransactionByHash(hash, true);
-    long t4 = System.currentTimeMillis();
     if (MapUtils.isEmpty(txObj)) {
       log.error("buildPayloadForExit fail, txObj is null, chainId is {}, tx is {}", chainId, hash);
       return new JSONObject();
     }
     long lastChildBlock = bttcParseDataService.getLastChildBlock(chainId);
-    long t5 = System.currentTimeMillis();
     String blockStr = txObj.getString("blockNumber");
     blockNumber = Long.parseLong(blockStr.substring(2), 16);
     if (blockNumber > lastChildBlock) {
@@ -80,7 +75,6 @@ public class BaseClient {
       return new JSONObject();
     }
     CheckPointInfoDto checkPointInfoDto = getCheckPointInfo(blockNumber, chainId);
-    long t6 = System.currentTimeMillis();
     if (ObjectUtils.isEmpty(checkPointInfoDto)) {
       log.error("buildPayloadForExit fail, get the related checkpoint fail, hash is {}, chain id is {}", hash, chainId);
       return new JSONObject();
@@ -92,20 +86,13 @@ public class BaseClient {
       log.error("buildPayloadForExit fail, get block proof fail, chainId is {}, tx hash is {},tx block is {}", chainId, hash, blockNumber);
       return new JSONObject();
     }
-    long t7 = System.currentTimeMillis();
     JSONObject receiptProof = proofUtils.getReceiptProof(txReceipt);
     if (MapUtils.isEmpty(receiptProof)) {
       log.error("buildPayloadForExit fail, get receipt proof fail, chainId is {}, tx hash is {},tx block is {}", chainId, hash, blockNumber);
       return new JSONObject();
     }
-    long t8 = System.currentTimeMillis();
     String proof = encodePayload( checkPointInfoDto.getCheckPointNum(), blockNumber, blockProof,
          receiptProof,  eventIndex);
-    long t9 = System.currentTimeMillis();
-    log.info("get receipt cost {} ms, get log index cost {} ms, get tx cost {} ms, get last child block cost {} ms,"
-        + "get checkpoint cost {} ms, get block proof cost {} ms, get receipt proof cost {} ms,"
-            + " _encodePayload cost {} ms",
-        t2 - t1, t3 - t2, t4- t3, t5 - t4, t6 - t5, t7 - t6, t8 - t7, t9 - t8);
     log.info("buildPayloadForExit success, chain id is {}, tx is {}, proof is {}", chainId,
         hash, proof);
     result.put("proof", proof);
